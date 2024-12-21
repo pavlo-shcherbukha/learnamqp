@@ -1,0 +1,31 @@
+﻿{% extends "layout.html" %}
+{% block title %}
+Результат завантаження ключа з файла
+{% endblock %}
+
+{% block content %}
+
+<h3>Помилка при виконанні</h3>
+
+
+<table border = 3>
+    
+
+    <tr>
+        <th>Error</th>
+        <td>{{data.errorDsc}}</td>
+    </tr>
+    <tr>
+        <th>errorCode</th>
+        <td>{{data.errorCode}}</td>
+    </tr>
+    <tr>
+        <th>trace</th>
+        <td>{{data.trace}}</td>
+    </tr>
+
+
+</table>
+{{data}}     
+
+{% endblock %}

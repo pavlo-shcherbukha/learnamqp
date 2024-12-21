@@ -1,0 +1,27 @@
+﻿{% extends "layout.html" %}
+{% block title %}
+Результат завантаження ключа з файла
+{% endblock %}
+
+{% block content %}
+
+<table border = 1>
+
+    <tr>
+       <th> Опис помилки</th>
+       <td> {{ data.error }} </td>
+    </tr>
+
+    <tr>
+       <th> Код помилки </th>
+       <td> {{ data.errorCode }} </td>
+    </tr> 
+
+    <tr>
+        <th> Стек помилки</th>
+        <td> {{ data.trace }} </td>
+     </tr> 
+</table>
+      
+
+{% endblock %}

@@ -1,0 +1,34 @@
+version: '3.8'
+services:
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    ports:
+      - '5672:5672'
+      - '15672:15672'
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+
+  sender-web:
+    build:
+      context: ./
+      dockerfile: docker-sender-web 
+      #target: debug 
+    ports:
+      - "8080:8080"
+      - "5678:5678" 
+    links:
+      - "rabbitmq"
+    environment:
+      FLASK_APP: "sender_web.webapp"
+      FLASK_ENV: "development"
+      FLASK_DEBUG: "0"
+      LOGLEVEL: "DEBUG"
+      APP_MODULE: "sender_web.webapp"
+      GUNICORN_CMD_ARGS: "--workers=1 --worker-connections=2000  --bind=0.0.0.0:8080 --timeout=600 --threads=50"
+      RABBITMQ_USER: "guest"
+      RABBITMQ_PASSWORD: "guest"
+      RABBITMQ_HOST: "rabbitmq"
+      RABBITMQ_PORT: "5672"      
+    # command: python -m debugpy --listen 0.0.0.0:5678 --wait-for-client -m flask run -h 0.0.0.0 -p 8080

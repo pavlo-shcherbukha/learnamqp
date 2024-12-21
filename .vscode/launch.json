@@ -1,0 +1,73 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+       
+        {
+            "name": "sender_web: Flask",
+            "type": "python",
+            "request": "launch",
+            "module": "flask",
+            "env": {
+                "FLASK_APP": "sender_web.webapp",
+                "FLASK_ENV": "development",
+                "FLASK_DEBUG": "0",
+                "LOGLEVEL":"DEBUG",
+                "RABBITMQ_USER": "guest",
+                "RABBITMQ_PASSWORD": "guest",
+                "RABBITMQ_HOST": "localhost",
+                "RABBITMQ_PORT": "5672"
+
+
+            },
+            "args": [
+                "run",
+                "--no-debugger",
+                "--no-reload",
+                "--port", "8080",
+
+            ],
+            "jinja": true
+        }, 
+        {
+            "name": "Python: publisher.py",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/publisher.py",
+            "env": {
+                "RABBITMQ_USER": "guest",
+                "RABBITMQ_PASSWORD": "guest",
+                "RABBITMQ_HOST": "localhost",
+                "RABBITMQ_PORT": "5672"
+
+            },
+            "args": [
+                "test",
+
+            ]
+        }, 
+        {
+            "name": "Python: reciever.py",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/main.py",
+            "env": {
+                "RABBITMQ_USER": "guest",
+                "RABBITMQ_PASSWORD": "guest",
+                "RABBITMQ_HOST": "localhost",
+                "RABBITMQ_PORT": "5672"
+
+            },
+            "args": [
+                "test",
+
+            ]
+        } 
+
+        
+
+
+    ]
+}

@@ -1,0 +1,13 @@
+
+datetime
+ptvsd 
+debugpy
+pika
+
+Flask
+gunicorn
+requests
+
+
+
+
