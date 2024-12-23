@@ -1,7 +1,7 @@
 from datetime import datetime
 import time
 from operator import truediv
-from flask import Flask, render_template, request, jsonify, Response, has_request_context, g
+from flask import Flask, render_template, request, jsonify, Response, has_request_context, g, redirect, url_for
 from flask.logging import default_handler
 import json
 import logging
@@ -178,6 +178,18 @@ def about():
     return render_template("about.html")
 
 #=================================================
+# Завантаження файла
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#=================================================
+@application.route("/imgupload/")
+def imgupload():
+    logger=logging.getLogger(__name__).getChild("imgupload")
+    logger.debug("upload page")
+    return render_template("uploader.html")
+
+
+
+#=================================================
 # Публікація повідомлення в чергу
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #=================================================
@@ -294,16 +306,68 @@ def publishmsg():
         logger.debug('finally block!!!!!')
 
 
+@application.route("/api/uploader", methods=["POST"])
+def uploader():
+    """
+        Uploading single file http request multipart/form-data
+    """
+    logger=logging.getLogger(__name__).getChild("uploader")
+
+    rabbitmq=None
+    logger.debug('Завантаження файла' )
+    
+    try:
+        logger.debug("Читаю файл")
+        fi = request.files
+        fo = request.form.to_dict(flat=True)
+
+        file = fi['file']
+        filename=file.filename
+        logger.debug( f"Завантажую файл {filename}")
+        logger.debug( "Поля форми: " + json.dumps(  fo, ensure_ascii=False ))
+        logger.debug( f"Читаю контент файл {filename}")
+        fcontent=file.read() 
+
+
+        q_name="test_queue"
+        message_prop = {
+            "content_type": file.mimetype,
+            "content_encoding":"utf-8",
+            "headers":{"filename": filename, "filedescription": fo["imgdsc"]},
+            "delivery_mode": 2,
+            "app_id": "sender_web"
+        }
+        rabbitmq = RabbitMQ()
+        rabbitmq.imgpublish(queue_name=q_name, message=fcontent, msgprop=message_prop )
+        logger.debug( f"Повідомлення успішно опубліковано в чегу {q_name}")
+
+        return render_template("uploader.html")
+
+    except Exception as e:
+            xerror={}
+            ex_type, ex_value, ex_traceback = sys.exc_info()
+            trace_back = traceback.extract_tb(ex_traceback)
+            stack_trace = list()
+            for trace in trace_back:
+                stack_trace.append("File : %s , Line : %d, Func.Name : %s, Message : %s" % (trace[0], trace[1], trace[2], trace[3]))
+            #ex_code=e.code
+            ex_name=ex_type.__name__
+            ex_dsc=ex_value.args[0]
+            if type(ex_dsc)!='str':
+                xerror["errorDsc"]=ex_dsc
+            else:
+                xerror["errorDsc"]=type(ex_dsc)
+
+            xerror["errorCode"]=ex_name
+            xerror["trace"]=stack_trace
+            logger.error( ex_dsc)
+            return render_template("oper_error.html",  data=xerror)
+    finally:
+        rabbitmq.close()
+        logger.debug('finally block!!!!!')
 
 
 
-    #if result["DB_HOST"]==None:
-    #   raise InvalidAPIUsageR( "InvalidAPIRequestParams",  "No  ENV [DB_HOST!]", target=label,status_code=422, payload = {"code": "NoDefined ENV", "description": "Not defined env variable DB_HOST" } )
-    #if result["DB_PORT"]==None:
-    #    raise InvalidAPIUsageR( "InvalidAPIRequestParams",  "No  ENV [DB_PORT!]", target=label,status_code=422, payload = {"code": "NoDefined ENV", "description": "Not defined env variable DB_PORT" } )
-    #if result["DB_NAME"]==None:
-    #    raise InvalidAPIUsageR( "InvalidAPIRequestParams",  "No  ENV [DB_NAME!]", target=label,status_code=422, payload = {"code": "NoDefined ENV", "description": "Not defined env variable DB_NAME" } )
-    #return json.dumps( result ), 200, {'Content-Type':'application/json'}
     
    
 

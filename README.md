@@ -39,9 +39,11 @@ devadm/qq
 
 ```bash
 
-docker-compose -f docker-compose-websender.yaml up --remove-orphans --build sender-web  receiver_web
+#docker-compose -f docker-compose-websender.yaml up --remove-orphans --build sender-web  receiver_web
 
 docker-compose -f docker-compose-websender.yaml stop
+
+docker-compose -f docker-compose-websender.yaml up --remove-orphans --build sender-web  receiver-web writer-web
 
 ```
 

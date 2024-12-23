@@ -45,3 +45,22 @@ class RabbitMQ:
             ),
         )
         print(f"Sent message to queue {queue_name}: {message}")
+
+    def imgpublish(self, queue_name, message, msgprop=None):
+        if not self.channel:
+            raise Exception("Connection is not established.")
+        self.channel.queue_declare(queue=queue_name, durable=True)
+        self.channel.basic_publish(
+            exchange="",
+            routing_key=queue_name,
+            body=message,
+            properties=pika.BasicProperties(
+                delivery_mode=msgprop["delivery_mode"],  
+                content_type=msgprop["content_type"],
+                content_encoding=msgprop["content_encoding"],
+                app_id=msgprop["app_id"],
+                headers=msgprop["headers"]
+
+            ),
+        )
+        print(f"Sent image to queue {queue_name}")

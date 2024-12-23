@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Upload New File</title>
+</head>
+
+<body>
+    <h1>Завантажити файл</h1>
+    <BR/><BR/>
+    <a href="/">Home</a>
+    <BR/><BR/>
+
+    <form action="{{url_for('uploader')}}" method="post" enctype="multipart/form-data">
+        <label for="imgdsc">Image description:</label>
+        <input type = "text" name = "imgdsc" value="" size="180"/>
+        <BR/><BR/>
+        <label for="file">Chose file for uploading and press "Upload":</label>
+        <input type="file" name="file">
+        <input type="submit" value="Upload">
+    </form>
+
+</body>
+
+</html>
