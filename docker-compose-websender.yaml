@@ -70,3 +70,22 @@ services:
       RABBITMQ_PASSWORD: "guest"
       RABBITMQ_HOST: "rabbitmq"
       RABBITMQ_PORT: "5672"      
+  writer-web:
+    build:
+      context: ./
+      dockerfile: docker-writer-web 
+    links:
+      - "rabbitmq"
+      - "couchdb"
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      couchdb:
+        condition: service_started
+    environment:
+      LOGLEVEL: "DEBUG"
+      APP_FILE: "receiver_weber.py"
+      RABBITMQ_USER: "guest"
+      RABBITMQ_PASSWORD: "guest"
+      RABBITMQ_HOST: "rabbitmq"
+      RABBITMQ_PORT: "5672"   
