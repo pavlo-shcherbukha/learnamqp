@@ -6,20 +6,40 @@ services:
     ports:
       - '5672:5672'
       - '15672:15672'
+    healthcheck:
+      test: ["CMD", "rabbitmqctl", "status"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
     environment:
       RABBITMQ_DEFAULT_USER: guest
       RABBITMQ_DEFAULT_PASS: guest
-
+  couchdb:
+    image: couchdb
+    #restart: always
+    ports:
+      - '5984:5984'
+    environment:
+      - COUCHDB_USER=devadm
+      - COUCHDB_PASSWORD=qq    
+    volumes:
+      - /home/psh/psh_dev/github-io/github-io/tz-000029-rabbitmq/py-rabbit/learnamqp/tz-000001-init/learnamqp/db
   sender-web:
     build:
       context: ./
       dockerfile: docker-sender-web 
-      #target: debug 
     ports:
       - "8080:8080"
       - "5678:5678" 
     links:
       - "rabbitmq"
+      - "couchdb"
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      couchdb:
+        condition: service_started
     environment:
       FLASK_APP: "sender_web.webapp"
       FLASK_ENV: "development"
@@ -31,4 +51,22 @@ services:
       RABBITMQ_PASSWORD: "guest"
       RABBITMQ_HOST: "rabbitmq"
       RABBITMQ_PORT: "5672"      
-    # command: python -m debugpy --listen 0.0.0.0:5678 --wait-for-client -m flask run -h 0.0.0.0 -p 8080
+  receiver-web:
+    build:
+      context: ./
+      dockerfile: docker-receive-web 
+    links:
+      - "rabbitmq"
+      - "couchdb"
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      couchdb:
+        condition: service_started
+    environment:
+      LOGLEVEL: "DEBUG"
+      APP_FILE: "receiver_weber.py"
+      RABBITMQ_USER: "guest"
+      RABBITMQ_PASSWORD: "guest"
+      RABBITMQ_HOST: "rabbitmq"
+      RABBITMQ_PORT: "5672"      

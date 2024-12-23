@@ -1,0 +1,14 @@
+version: '3.8'
+services:
+  couchdb:
+    image: couchdb
+    #restart: always
+    ports:
+      - '5984:5984'
+    environment:
+      - COUCHDB_USER=devadm
+      - COUCHDB_PASSWORD=qq    
+    volumes:
+      - /home/psh/psh_dev/github-io/github-io/tz-000029-rabbitmq/py-rabbit/learnamqp/tz-000001-init/learnamqp/db
+      #- /c:/PSHDEV/PSH-PYTHON/flask-couchdb/sh-flask-couchdb/db
+

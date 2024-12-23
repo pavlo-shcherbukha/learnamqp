@@ -49,10 +49,10 @@
             ]
         }, 
         {
-            "name": "Python: reciever.py",
+            "name": "Python: worker.py",
             "type": "python",
             "request": "launch",
-            "program": "${workspaceFolder}/main.py",
+            "program": "${workspaceFolder}/receiver_weber.py",
             "env": {
                 "RABBITMQ_USER": "guest",
                 "RABBITMQ_PASSWORD": "guest",

@@ -33,13 +33,22 @@ http://localhost:15672/
 
 guest/guest
 
-
+http://localhost:5984/_utils/
+devadm/qq
 
 
 ```bash
 
-docker-compose -f docker-compose-websender.yaml up --remove-orphans --build sender-web
+docker-compose -f docker-compose-websender.yaml up --remove-orphans --build sender-web  receiver_web
 
 docker-compose -f docker-compose-websender.yaml stop
 
 ```
+
+
+
+soket io
+https://medium.com/the-research-nest/how-to-log-data-in-real-time-on-a-web-page-using-flask-socketio-in-python-fb55f9dad100
+
+
+https://dhruvadave5297.medium.com/demo-application-for-background-processing-with-rabbitmq-python-flask-c3402bdcf7f0
