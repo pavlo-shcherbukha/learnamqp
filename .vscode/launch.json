@@ -49,7 +49,7 @@
             ]
         }, 
         {
-            "name": "Python: worker.py",
+            "name": "Python: receiver.py",
             "type": "python",
             "request": "launch",
             "program": "${workspaceFolder}/receiver_weber.py",

@@ -6,6 +6,8 @@ from receiver_web.rabbitmq import RabbitMQ
 import logging
 import receiver_web.shjsonformatter
 from datetime import datetime,timedelta
+import cv2
+import numpy as np 
 
 
 logger = logging.getLogger(__name__)
@@ -33,8 +35,21 @@ logger.addHandler(handler)
 
 logger.debug("debug message")
 
+
+def imagedecode(imgbarray):
+    img = np.asarray(bytearray( imgbarray ), dtype="uint8") 
+    image = cv2.imdecode(img, cv2.IMREAD_COLOR) 
+    gray_image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    cv2.imwrite("result.jpg", gray_image) 
+
 def callback(ch, method, properties, body):
-    logger.debug(f"Received message: {body}")
+    logger.debug(f"Received message: ====================================================================================")
+    logger.debug(f"Received message: {properties}")
+    logger.debug(f"Received message: ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
+    #logger.debug(f"Received message: {body}")
+    imagedecode(body)
+    logger.debug(f"Received message: =====================================================================================")
+
 
 
 def main():
