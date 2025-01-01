@@ -54,3 +54,69 @@ https://medium.com/the-research-nest/how-to-log-data-in-real-time-on-a-web-page-
 
 
 https://dhruvadave5297.medium.com/demo-application-for-background-processing-with-rabbitmq-python-flask-c3402bdcf7f0
+
+
+
+
+# How to encode OpenCV Image as bytes using Python
+https://stackoverflow.com/questions/59259786/how-to-encode-opencv-image-as-bytes-using-python/59260369#59260369
+
+```text
+
+
+I am having difficulty sending a jpeg opened with cv2 to a server as bytes. The server complains that the file type is not supported. I can send it without problems using Python's "open" function, but not with OpenCV. How can I get this to work?
+
+```
+
+```text
+
+
+I want to start by getting your test case working, we will do this by using a lossless format with no compression so we are comparing apples to apples:
+```
+
+```python
+
+import cv2
+
+path_in = r".\test\frame1.jpg"
+path_temp = r".\test\frame1.bmp"
+img = cv2.imread(path_in, -1)
+cv2.imwrite(path_temp, img) # save in lossless format for a fair comparison
+
+with open(path_temp, "rb") as image:
+    image1 = image.read()
+
+image2 = cv2.imencode(".bmp", img)[1].tobytes() #also tried tostring()
+
+print(image1 == image2)
+#This prints True. 
+```
+
+
+I want to start by getting your test case working, we will do this by using a lossless format with no compression so we are comparing apples to apples:
+
+```
+import cv2
+
+path_in = r".\test\frame1.jpg"
+path_temp = r".\test\frame1.bmp"
+img = cv2.imread(path_in, -1)
+cv2.imwrite(path_temp, img) # save in lossless format for a fair comparison
+
+with open(path_temp, "rb") as image:
+    image1 = image.read()
+
+image2 = cv2.imencode(".bmp", img)[1].tobytes() #also tried tostring()
+
+print(image1 == image2)
+
+#This prints True. 
+```
+
+This is not ideal since compression is desirable for moving around bytes, but it illustrates that there is nothing inherently wrong with your encoding.
+
+Without knowing the details of your server it is hard to know why it isn't accepting the opencv encoded images. Some suggestions are:
+
+    provide format specific encoding parameters as described in the [docs](https://docs.opencv.org/3.4/d4/da8/group__imgcodecs.html#ga461f9ac09887e47797a54567df3b8b63), available flags are [here](https://docs.opencv.org/3.4/d4/da8/group__imgcodecs.html#ga292d81be8d76901bff7988d18d2b42ac)
+    try different extensions
+

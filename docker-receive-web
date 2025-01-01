@@ -4,7 +4,8 @@ FROM registry.fedoraproject.org/f33/python3
 
 USER 0
 COPY . /tmp/src
-
+#RUN yum  install -y libsm6 libxext6 ffmpeg libfontconfig1 libxrender1 libgl1-mesa-glx
+RUN yum install -y opencv
 RUN /usr/bin/fix-permissions /tmp/src
 
 # Remote debug run
@@ -14,8 +15,13 @@ RUN /usr/bin/fix-permissions /tmp/src
 USER 1001
 
 # Install the dependencies
+
 RUN python3.9 -m pip install --upgrade pip
+
 RUN /usr/libexec/s2i/assemble
+#RUN pip3 install opencv-python
+RUN pip3 install opencv-contrib-python
+RUN pip3 install numpy
 EXPOSE 8080
 
 # Remote debug run: packages
