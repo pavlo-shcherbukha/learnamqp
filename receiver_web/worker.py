@@ -146,7 +146,7 @@ def main():
 
             logger.debug(f"Публікую повідомлення в чергу")
             cust_headers_in = properties.headers;
-            cust_headers = {"filename": changeext(  cust_headers_in["filename"] , ".png"), "filedescription": cust_headers_in["filedescription"]},
+            cust_headers = {"filename": changeext(  cust_headers_in["filename"] , ".png"), "filedescription": cust_headers_in["filedescription"]}
             msgprop = {
                 "content_type": 'image/png',
                 "content_encoding": properties.content_encoding,
