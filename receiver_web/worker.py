@@ -38,17 +38,6 @@ logger.addHandler(handler)
 
 logger.debug("debug message")
 
-"""
-def imgput( ):
-    q_name="todbwriter"
-    logger.debug(f"Publish message to {q_name}")
-    rmq = RabbitMQ()
-    rmq.imgpublish(queue_name=q_name, message=img_gray, msgprop=img_prop )
-    logger.debug(f"Published message to {q_name}")             
-    rmq.close()
-    logger.debug(f"Published OK to {q_name}")             
-"""
-
 
 def read_image(file_path):
     with open(file_path, "rb") as file:
@@ -83,31 +72,7 @@ def imagedecode(imgbarray):
     # повертаю результат 
     return gray_image_b
 
-"""
-def callback(ch, method, properties, body):
-    logger.debug(f"Received message: ====================================================================================")
-    logger.debug(f"Received message: {properties}")
-    logger.debug(f" app-id {properties.app_id}")
-    logger.debug(f" custom headers: {properties.headers}")
-    logger.debug(f"Received message: ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
-    #logger.debug(f"Received message: {body}")
-    global img_gray
-    global img_prop
-    img_gray=imagedecode(body)
-    img_prop = {
-            "content_type": properties.content_type,
-            "content_encoding": properties.content_encoding,
-            "headers": properties.headers,
-            "delivery_mode": 2,
-            "app_id": "receiver_web"
-        }
 
-
-
-    logger.debug(f"Received message: =====================================================================================")
-    time.sleep(10)
-    #imgput()
-"""
 
 
 def main():
