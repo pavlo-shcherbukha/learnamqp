@@ -64,7 +64,32 @@
                 "test",
 
             ]
-        } 
+        },
+        {
+            "name": "Python: writer.py",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/writer_weber.py",
+            "env": {
+                "RABBITMQ_USER": "guest",
+                "RABBITMQ_PASSWORD": "guest",
+                "RABBITMQ_HOST": "localhost",
+                "RABBITMQ_PORT": "5672",
+                "COUCHDB_AUTH_TYPE":"COUCHDB_SESSION",
+                "COUCHDB_URL":"http://localhost:5984",
+                "COUCHDB_USERNAME":"devadm",
+                "COUCHDB_PASSWORD":"qq"
+
+
+
+
+
+            },
+            "args": [
+                "test",
+
+            ]
+        }  
 
         
 

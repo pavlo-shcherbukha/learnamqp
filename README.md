@@ -120,3 +120,8 @@ Without knowing the details of your server it is hard to know why it isn't accep
     provide format specific encoding parameters as described in the [docs](https://docs.opencv.org/3.4/d4/da8/group__imgcodecs.html#ga461f9ac09887e47797a54567df3b8b63), available flags are [here](https://docs.opencv.org/3.4/d4/da8/group__imgcodecs.html#ga292d81be8d76901bff7988d18d2b42ac)
     try different extensions
 
+## Cloudant
+
+https://docs.couchdb.org/en/stable/
+https://pypi.org/project/ibmcloudant/#authentication-with-environment-variables
+https://cloud.ibm.com/apidocs/cloudant?code=python

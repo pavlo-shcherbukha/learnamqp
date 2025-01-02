@@ -2,13 +2,21 @@ import os
 import time 
 import json
 import sys
-from receiver_web.rabbitmq import RabbitMQ
+#from receiver_web.rabbitmq import RabbitMQ
 import logging
-import receiver_web.shjsonformatter
+import writer_web.shjsonformatter
 from datetime import datetime,timedelta
+import pika
+import os
 
+from ibmcloudant.cloudant_v1 import CloudantV1
+from ibmcloudant import CouchDbSessionAuthenticator
+
+from writer_web.couchdb import CouchDB
 
 logger = logging.getLogger(__name__)
+img_gray = None
+img_prop = None
 
 apploglevel=os.environ.get("LOGLEVEL")
 if apploglevel==None:
@@ -27,29 +35,114 @@ else:
     logger.setLevel(logging.DEBUG)  
 
 handler = logging.StreamHandler()
-handler.setFormatter( receiver_web.shjsonformatter.JSONFormatter())
+handler.setFormatter( writer_web.shjsonformatter.JSONFormatter())
 
 logger.addHandler(handler)
 
 logger.debug("debug message")
 
-def callback(ch, method, properties, body):
-    logger.debug(f"Received message: {body}")
+
+def read_image(file_path):
+    with open(file_path, "rb") as file:
+        image_bytes = file.read()
+    return image_bytes
+
+def save_modified_image(file_path, modified_bytes):
+    with open(file_path, "wb") as file:
+        file.write(modified_bytes)
+
+def changeext(file_name, new_ext):
+    ext = '.'+ os.path.realpath(file_name).split('.')[-1:][0]
+    filefinal = file_name.replace(ext,'')
+    filefinal = filefinal + '.zip'
+    return filefinal
+
+
+
+def imagedecode(imgbarray):
+    """
+        Перекодувати зображення в сірий колір і як .png
+    """
+    # Перекодуб вмасив байт
+    img = np.asarray(bytearray( imgbarray ), dtype="uint8") 
+    # Пеоетворюю в CV2 image
+    image = cv2.imdecode(img, cv2.IMREAD_COLOR) 
+    # пробимо зображення сірим
+    gray_image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    #Перетворюю image як масив байт як .png
+    gray_image_b = cv2.imencode(".png", gray_image)[1].tobytes() 
+    #save_modified_image("./result2.bmp", gray_image_b)
+    # повертаю результат 
+    return gray_image_b
+
+
 
 
 def main():
-    rabbitmq = RabbitMQ()
+    logger.debug("Читаю налаштування")
+    user = os.getenv("RABBITMQ_USER", "guest")
+    password = os.getenv("RABBITMQ_PASSWORD", "guest")
+    host = os.getenv("RABBITMQ_HOST", "localhost")
+    port = int(os.getenv("RABBITMQ_PORT", 5672))
+    logger.debug("Підключаюся до Rabbit MQ")
+    connection = pika.BlockingConnection(pika.ConnectionParameters(host))
+    channel = connection.channel()
+
+    logger.debug("Налаштовую черги")
+    q_name_in="test_dbwrt"
+    
+    logger.debug("Налаштовую канал для читання повідомтлень")
+    channel.queue_declare(queue=q_name_in, durable=True) 
+
+    logger.debug("Підключаю базу даних")
+    couchd = CouchDB( __name__)
+    dblist=couchd.checkDataBases()
+    logger.debug(f"Database lists: {dblist}")
+
     try:
         logger.debug("Connection to RabbitMQ established successfully.")
-        rabbitmq.consume(queue_name="test_queue", callback=callback)
+        def callback(ch, method, properties, body):
+            """
+                Обробка отриманого повідомлення
+            """
+            logger.debug(f"Received message: ====================================================================================")
+            logger.debug(f"Received message: {properties}")
+            logger.debug(f" app-id {properties.app_id}")
+            logger.debug(f" custom headers: {properties.headers}")
+            logger.debug(f"Received message: ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
+            imgprops={}
+            imgprops["filename"]=properties.headers["filename"]
+            imgprops["filedsc"]=properties.headers["filedescription"]
+            imgprops["contenttype"]=properties.content_type
+            imgprops["contentecoding"]=properties.content_encoding
+            logger.debug("Записую образ в базу даних")
+            doccrts=couchd.saveImage(body, imgprops )
+            logger.debug(f"Результат запису в БД {doccrts}")
+
+            
+
+        logger.debug(f"Налаштовую читання повідомлень з черги")
+        channel.basic_consume(queue=q_name_in, on_message_callback=callback)
+
+        logger.debug(f"Читаю повідомлення з черги")
+        channel.start_consuming()
+
+   
+
+        
+        
+        
+        
+        #logger.debug(f"Читаю COUCHDB SERVICE{response}")
+        logger.debug(f"Читаю COUCHDBи OOOOO")
+
+
+        
+      
     except Exception as e:
         logger.debug(f"Failed to establish connection to RabbitMQ: {e}")
         sys.exit(1)
-    finally:
-        rabbitmq.close()
-
-def mainlog():
-    logger.debug("DEBUGGGGG")
-    logger.info("INFOOOOOO")
-
+    #finally:
+        #rabbitmq.close()
+    
 
