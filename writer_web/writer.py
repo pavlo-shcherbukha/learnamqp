@@ -85,7 +85,13 @@ def main():
     host = os.getenv("RABBITMQ_HOST", "localhost")
     port = int(os.getenv("RABBITMQ_PORT", 5672))
     logger.debug("Підключаюся до Rabbit MQ")
-    connection = pika.BlockingConnection(pika.ConnectionParameters(host))
+    #connection = pika.BlockingConnection(pika.ConnectionParameters(host))
+
+    credentials = pika.PlainCredentials(  username=user, password=password )
+    parameters = pika.ConnectionParameters(host=host, port=port, credentials=credentials)
+    connection = pika.BlockingConnection(parameters)
+
+
     channel = connection.channel()
 
     logger.debug("Налаштовую черги")
