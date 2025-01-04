@@ -84,8 +84,12 @@ services:
         condition: service_started
     environment:
       LOGLEVEL: "DEBUG"
-      APP_FILE: "receiver_weber.py"
+      APP_FILE: "writer_weber.py"
       RABBITMQ_USER: "guest"
       RABBITMQ_PASSWORD: "guest"
       RABBITMQ_HOST: "rabbitmq"
       RABBITMQ_PORT: "5672"   
+      COUCHDB_AUTH_TYPE: "COUCHDB_SESSION"
+      COUCHDB_URL: "http://couchdb:5984"
+      COUCHDB_USERNAME: "devadm"
+      COUCHDB_PASSWORD: "qq"      

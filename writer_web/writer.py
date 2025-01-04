@@ -59,25 +59,6 @@ def changeext(file_name, new_ext):
 
 
 
-def imagedecode(imgbarray):
-    """
-        Перекодувати зображення в сірий колір і як .png
-    """
-    # Перекодуб вмасив байт
-    img = np.asarray(bytearray( imgbarray ), dtype="uint8") 
-    # Пеоетворюю в CV2 image
-    image = cv2.imdecode(img, cv2.IMREAD_COLOR) 
-    # пробимо зображення сірим
-    gray_image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-    #Перетворюю image як масив байт як .png
-    gray_image_b = cv2.imencode(".png", gray_image)[1].tobytes() 
-    #save_modified_image("./result2.bmp", gray_image_b)
-    # повертаю результат 
-    return gray_image_b
-
-
-
-
 def main():
     logger.debug("Читаю налаштування")
     user = os.getenv("RABBITMQ_USER", "guest")
