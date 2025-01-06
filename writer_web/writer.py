@@ -102,9 +102,11 @@ def main():
             imgprops["filedsc"]=properties.headers["filedescription"]
             imgprops["contenttype"]=properties.content_type
             imgprops["contentecoding"]=properties.content_encoding
+            imgprops["correlation_id"]=properties.correlation_id
             logger.debug("Записую образ в базу даних")
             doccrts=couchd.saveImage(body, imgprops )
             logger.debug(f"Результат запису в БД {doccrts}")
+            channel.basic_ack(delivery_tag=method.delivery_tag)
 
             
 

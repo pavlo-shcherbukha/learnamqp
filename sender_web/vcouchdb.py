@@ -75,7 +75,6 @@ class CouchDB:
         imgdsc["typedoc"]="GREY"
         imgdsc["filename"]=imgprops["filename"]
         imgdsc["description"]=imgprops["filedsc"]
-        imgdsc["correlation_id"]=imgprops["correlation_id"]
 
         bino={}   
         bino["data"]=imgb64
@@ -86,3 +85,23 @@ class CouchDB:
         imgdsc["_attachments"]=fl
         doc = self.service.post_document(db='dbimage', document=imgdsc).get_result()  
         return  doc  
+    
+    def readImage(self, docid):
+        doc = self.service.get_document(db='dbimage',doc_id=docid).get_result()
+
+        attachment = self.service.get_attachment( db='dbimage', doc_id=doc["_id"], attachment_name=doc["filename"] ).get_result().content
+        return attachment
+    
+    def imageList(self):
+        imgList = self.service.post_find(
+                                        db='dbimage',
+                                        selector={"typedoc": {"$eq": "GREY"}},
+                                        fields=["_id","filename","typedoc","correlation_id"],
+                                        limit=3
+                                        ).get_result()
+        return imgList     
+
+    
+   
+
+

@@ -51,7 +51,7 @@ def save_modified_image(file_path, modified_bytes):
 def changeext(file_name, new_ext):
     ext = '.'+ os.path.realpath(file_name).split('.')[-1:][0]
     filefinal = file_name.replace(ext,'')
-    filefinal = filefinal + '.zip'
+    filefinal = filefinal + '.png'
     return filefinal
 
 
@@ -124,6 +124,7 @@ def main():
                 "content_encoding": properties.content_encoding,
                 "headers": cust_headers,
                 "delivery_mode": 2,
+                "correlation_id": properties.correlation_id,
                 "app_id": "receiver_web"
             }   
 
@@ -132,6 +133,7 @@ def main():
                             content_type=msgprop["content_type"],
                             headers={"filename":  changeext(  cust_headers_in["filename"] , ".png"), "filedescription": cust_headers_in["filedescription"] },
                             delivery_mode=2,
+                            correlation_id=msgprop["correlation_id"],
                             app_id= "receiver_web")
             )
             channel.basic_ack(delivery_tag=method.delivery_tag)

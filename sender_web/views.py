@@ -5,14 +5,17 @@ from flask import Flask, render_template, request, jsonify, Response, has_reques
 from flask.logging import default_handler
 import json
 import logging
+from base64 import b64encode, b16decode
 # my own logger
 import sender_web.shjsonformatter
 from sender_web.rabbitmq import RabbitMQ
+from sender_web.vcouchdb import CouchDB
 
 import datetime
 import sys
 import os
 import traceback
+import uuid 
 
 if os.environ.get("APP_DEBUG") == 'DEBUG_BRK':
     import debugpy
@@ -155,6 +158,12 @@ except Exception as e:
     ex_dsc=ex_value.args[0]
     logger.error(ex_dsc)
 
+logger.debug("Підключаю базу даних")
+couchd = CouchDB( __name__)
+dblist=couchd.checkDataBases()
+logger.debug(f"Database lists: {dblist}")
+
+
 #=================================================
 # Головна сторінка
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -198,6 +207,38 @@ def pubmsg():
     logger=logging.getLogger(__name__).getChild("pubmsg")
     logger.debug("Публікація повідомлення в чергу")
     return render_template("pubmsg.html")
+
+
+#=================================================
+# Show images 
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#=================================================
+@application.route("/showimage/<iddoc>")
+def showimage( iddoc):
+    logger=logging.getLogger(__name__).getChild("showimage")
+    logger.debug("showimage page !!!iddoc!!: {iddoc}")
+    logger.debug("Читаю картінку")
+    image=couchd.readImage(docid=iddoc)
+    imageb64 = b64encode(image).decode("utf-8")
+    logger.debug( f"Повідомлення успішно опубліковано в чегу ")
+    #return json.dumps( doc ), 200, {'Content-Type':'application/json'}
+    return render_template("showimage.html", image=imageb64)    
+    #return render_template("showimage.html")
+
+@application.route("/imagelist", methods=["GET"])
+def imagelist():
+    logger.debug('читаю список картінок' )
+    logger.debug("Читаю картінку")
+    imageList=couchd.imageList()
+    return render_template("listimage.html", listimg=imageList["docs"])    
+
+
+
+
+
+
+
+
 
 
 
@@ -327,7 +368,7 @@ def uploader():
         logger.debug( "Поля форми: " + json.dumps(  fo, ensure_ascii=False ))
         logger.debug( f"Читаю контент файл {filename}")
         fcontent=file.read() 
-
+        corid=str(uuid.uuid4())
 
         q_name="test_queue"
         message_prop = {
@@ -335,7 +376,8 @@ def uploader():
             "content_encoding":"utf-8",
             "headers":{"filename": filename, "filedescription": fo["imgdsc"]},
             "delivery_mode": 2,
-            "app_id": "sender_web"
+            "app_id": "sender_web",
+            "correlation_id": corid
         }
         rabbitmq = RabbitMQ()
         rabbitmq.imgpublish(queue_name=q_name, message=fcontent, msgprop=message_prop )
@@ -371,6 +413,78 @@ def uploader():
     
    
 
+@application.route("/api/image", methods=["GET"])
+def readimage():
+    label="publishmsg"
+    body={}
+    mimetype = request.mimetype
+    logger.debug(f"mimetype = {mimetype}")
+      
 
+    logger.debug('Отримано тіло запита' + json.dumps(  body, ensure_ascii=False ))
+    logger.debug('Публікую запит в чергу' )
+    
+    try:
+        logger.debug("Читаю картінку")
+        image=couchd.readImage()
+        imageb64 = b64encode(image).decode("utf-8")
+        logger.debug( f"Повідомлення успішно опубліковано в чегу ")
+        #return json.dumps( doc ), 200, {'Content-Type':'application/json'}
+        return render_template("showimage.html", image=image)
+    except Exception as e:
+            xerror={}
+            ex_type, ex_value, ex_traceback = sys.exc_info()
+            trace_back = traceback.extract_tb(ex_traceback)
+            stack_trace = list()
+            for trace in trace_back:
+                stack_trace.append("File : %s , Line : %d, Func.Name : %s, Message : %s" % (trace[0], trace[1], trace[2], trace[3]))
+            #ex_code=e.code
+            ex_name=ex_type.__name__
+            ex_dsc=ex_value.args[0]
+            if type(ex_dsc)!='str':
+                xerror["errorDsc"]=ex_dsc
+            else:
+                xerror["errorDsc"]=type(ex_dsc)
+
+            xerror["errorCode"]=ex_name
+            xerror["trace"]=stack_trace
+            logger.error( ex_dsc)
+            return render_template("oper_error.html",  data=xerror)
+    finally:
+        logger.debug('finally block!!!!!')
+
+
+@application.route("/api/imagelist", methods=["GET"])
+def readimagelist():
+    #logger.debug('Отримано тіло запита' + json.dumps(  body, ensure_ascii=False ))
+    logger.debug('читаю список картінок' )
+    
+    try:
+        logger.debug("Читаю картінку")
+        imageList=couchd.imageList()
+
+        return json.dumps( imageList ), 200, {'Content-Type':'application/json'}
+
+    except Exception as e:
+            xerror={}
+            ex_type, ex_value, ex_traceback = sys.exc_info()
+            trace_back = traceback.extract_tb(ex_traceback)
+            stack_trace = list()
+            for trace in trace_back:
+                stack_trace.append("File : %s , Line : %d, Func.Name : %s, Message : %s" % (trace[0], trace[1], trace[2], trace[3]))
+            #ex_code=e.code
+            ex_name=ex_type.__name__
+            ex_dsc=ex_value.args[0]
+            if type(ex_dsc)!='str':
+                xerror["errorDsc"]=ex_dsc
+            else:
+                xerror["errorDsc"]=type(ex_dsc)
+
+            xerror["errorCode"]=ex_name
+            xerror["trace"]=stack_trace
+            logger.error( ex_dsc)
+            return render_template("oper_error.html",  data=xerror)
+    finally:
+        logger.debug('finally block!!!!!')
 
 

@@ -59,6 +59,7 @@ class RabbitMQ:
                 content_type=msgprop["content_type"],
                 content_encoding=msgprop["content_encoding"],
                 app_id=msgprop["app_id"],
+                correlation_id=msgprop["correlation_id"],
                 headers=msgprop["headers"]
 
             ),
