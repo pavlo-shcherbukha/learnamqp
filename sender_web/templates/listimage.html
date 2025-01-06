@@ -1,0 +1,21 @@
+{% extends "layout.html" %}
+{% block title %}
+Show image
+{% endblock %}
+{% block content %}
+
+  
+    <table border = 1>
+        <tr><th>File</th>   <th>Document ID</th> <th>Corelation ID</th></tr>							
+        {% for item in  listimg %}
+        <tr>
+            <th> {{  item.filename }}</th>  
+            <td> {{ item._id}}  <a href="http://localhost:8080/showimage/{{ item._id }}" target="_blank"><SECt>Переглянути</SECt></a></td>  
+            <td>{{ item.correlation_id}}   </td>
+        </tr>	
+        
+        {% endfor %}					                        
+    </table>
+
+<p>Flask JSON logging</p>
+{% endblock %}

@@ -1,0 +1,15 @@
+
+datetime
+ptvsd 
+debugpy
+pika
+
+Flask
+gunicorn
+requests
+#opencv-contrib-python
+#numpy
+#ibmcloudant
+
+
+

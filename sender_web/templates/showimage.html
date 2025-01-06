@@ -1,0 +1,9 @@
+{% extends "layout.html" %}
+{% block title %}
+Show image
+{% endblock %}
+{% block content %}
+    <img src="data:;base64,{{ image }}"  width="25%" height="25%"/>
+
+<p>Flask JSON logging</p>
+{% endblock %}
