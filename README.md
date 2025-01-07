@@ -11,6 +11,16 @@ The main idea of the prototype is to transfer binary objects through RabbitMQ qu
 - [Pika Python library for Rabbit MQ](https://pypi.org/project/pika/)
 - [IBM Cloudant library for Cloudant and CouchDB](https://cloud.ibm.com/apidocs/cloudant?code=python)
 
+## Useful links
+
+[Docker RabbitMQ](https://hub.docker.com/_/rabbitmq/)
+[Rabbit tutorials](https://www.rabbitmq.com/tutorials)
+[habre](https://habr.com/ru/articles/434510/)
+[Getting Started with RabbitMQ and Python: A Practical Guide. Docker compose](https://dev.to/felipepaz/getting-started-with-rabbitmq-and-python-a-practical-guide-57fi)
+
+https://github.com/pazfelipe/python-rabbitmq/tree/main
+
+
 ## An Architecture of the prototype
 
 ```mermaid
@@ -49,18 +59,138 @@ The main idea of the prototype is to transfer binary objects through RabbitMQ qu
 ```
 
 
+## Run it locally
 
-## Користні лінки
-
-[Docker RabbitMQ](https://hub.docker.com/_/rabbitmq/)
-[Rabbit tutorials](https://www.rabbitmq.com/tutorials)
-[habre](https://habr.com/ru/articles/434510/)
-[Getting Started with RabbitMQ and Python: A Practical Guide. Docker compose](https://dev.to/felipepaz/getting-started-with-rabbitmq-and-python-a-practical-guide-57fi)
-
-https://github.com/pazfelipe/python-rabbitmq/tree/main
+Before run should be installed Docker and Docker Composer
 
 
-## RUN DOCKER
+- Clone git repository
+- Create and activate local environment
+
+```bash
+
+python3  -m venv env
+#linux
+source ./env/bin/activate
+#windows
+.\env\Scripts\activate.ps1 
+```
+
+- install dependency
+
+```bash
+
+python3 -m pip install -r requirements.txt
+
+```
+- check env veriables in file /.vscode/launch.json
+
+```json
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+       
+        {
+            "name": "sender_web: Flask",
+            "type": "python",
+            "request": "launch",
+            "module": "flask",
+            "env": {
+                "FLASK_APP": "sender_web.webapp",
+                "FLASK_ENV": "development",
+                "FLASK_DEBUG": "0",
+                "LOGLEVEL":"DEBUG",
+                "RABBITMQ_USER": "guest",
+                "RABBITMQ_PASSWORD": "guest",
+                "RABBITMQ_HOST": "localhost",
+                "RABBITMQ_PORT": "5672",
+                "COUCHDB_AUTH_TYPE":"COUCHDB_SESSION",
+                "COUCHDB_URL":"http://localhost:5984",
+                "COUCHDB_USERNAME":"devadm",
+                "COUCHDB_PASSWORD":"qq"                
+
+
+            },
+            "args": [
+                "run",
+                "--no-debugger",
+                "--no-reload",
+                "--port", "8080",
+
+            ],
+            "jinja": true
+        }, 
+        {
+            "name": "Python: receiver.py",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/receiver_weber.py",
+            "env": {
+                "RABBITMQ_USER": "guest",
+                "RABBITMQ_PASSWORD": "guest",
+                "RABBITMQ_HOST": "localhost",
+                "RABBITMQ_PORT": "5672"
+
+            },
+            "args": [
+                "test",
+
+            ]
+        },
+        {
+            "name": "Python: writer.py",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/writer_weber.py",
+            "env": {
+                "RABBITMQ_USER": "guest",
+                "RABBITMQ_PASSWORD": "guest",
+                "RABBITMQ_HOST": "localhost",
+                "RABBITMQ_PORT": "5672",
+                "COUCHDB_AUTH_TYPE":"COUCHDB_SESSION",
+                "COUCHDB_URL":"http://localhost:5984",
+                "COUCHDB_USERNAME":"devadm",
+                "COUCHDB_PASSWORD":"qq"
+
+            },
+            "args": [
+                "test",
+
+            ]
+        }  
+    ]
+}
+```
+
+- Chose nesessary application and run in in debug mode
+
+
+## Run it in docker composer
+
+
+- run docker composer file 
+
+```bash
+
+docker-compose -f docker-compose-websender.yaml up --remove-orphans --build sender-web receiver-web writer-web
+
+```
+
+Web application is sccessed by url http://localhost:8080
+RabbitMq Control panel is sccessed by url http://localhost:15672/ , login/password is guest/guest (default)
+CouchDB is accessed by url http://localhost:5984/_utils/ , login/password is devadm/qq
+
+
+- stop docker composer
+docker-compose -f docker-compose-websender.yaml stop
+
+
+## Addidtion Nottice
+
+- RUN  RabbimMq as single DOCKER
 
 ```bash
 docker pull rabbitmq
@@ -71,42 +201,13 @@ docker run -d --hostname my-rabbit --name some-rabbit -e RABBITMQ_DEFAULT_USER=u
 
 docker run -d --hostname my-rabbit --name some-rabbit -e RABBITMQ_DEFAULT_VHOST=my_vhost rabbitmq:3-management
 
-docker-compose up -d
-```
-
-Got to the management console
-
-http://localhost:15672/
-
-guest/guest
-
-http://localhost:5984/_utils/
-devadm/qq
-
-
-```bash
-
-#docker-compose -f docker-compose-websender.yaml up --remove-orphans --build sender-web  receiver_web
-
-docker-compose -f docker-compose-websender.yaml stop
-
-docker-compose -f docker-compose-websender.yaml up --remove-orphans --build sender-web receiver-web writer-web
 
 ```
 
+- About open-CV
 
 
-soket io
-https://medium.com/the-research-nest/how-to-log-data-in-real-time-on-a-web-page-using-flask-socketio-in-python-fb55f9dad100
-
-
-https://dhruvadave5297.medium.com/demo-application-for-background-processing-with-rabbitmq-python-flask-c3402bdcf7f0
-
-
-
-
-# How to encode OpenCV Image as bytes using Python
-https://stackoverflow.com/questions/59259786/how-to-encode-opencv-image-as-bytes-using-python/59260369#59260369
+1. [How to encode OpenCV Image as bytes using Python](https://stackoverflow.com/questions/59259786/how-to-encode-opencv-image-as-bytes-using-python/59260369#59260369)
 
 ```text
 
@@ -142,7 +243,7 @@ print(image1 == image2)
 
 I want to start by getting your test case working, we will do this by using a lossless format with no compression so we are comparing apples to apples:
 
-```
+```  python
 import cv2
 
 path_in = r".\test\frame1.jpg"
