@@ -1,7 +1,54 @@
-# learnamqp  Вивчення використання amqp
+# learnamqp - Learing Python Pika and rabbit MQ. Simple prototype.
 
-## Постановка проблеми
-Навчитися працювати з RabbotMQ за python
+## Short description
+The main idea of the prototype is to transfer binary objects through RabbitMQ queues and process that objects. As processor I have chosen a simple image processor by using the python open-cv library. Image processing  does two simple steps: makes image gray, transform image byte array into .png. Then, processed image saves into NoSql Database. Processed images that had stored in database can be viewed from web page  
+
+## Used tools
+- [Docker RabbitMQ](https://hub.docker.com/_/rabbitmq/)
+- [Docker CouchDB](https://hub.docker.com/_/couchdb)
+- [RedHat  Python 3.9  container for running various Python applications](https://catalog.redhat.com/software/containers/ubi9/python-39/61a61032bfd4a5234d59629e)
+- [Docker Compose](https://docs.docker.com/compose/)
+- [Pika Python library for Rabbit MQ](https://pypi.org/project/pika/)
+- [IBM Cloudant library for Cloudant and CouchDB](https://cloud.ibm.com/apidocs/cloudant?code=python)
+
+## An Architecture of the prototype
+
+```mermaid
+    C4Context
+      title architecture
+      
+        Person(customerA, "User A", "Upload image to processing")
+        Person(customerB, "User B", "View processed image")
+
+        System(WebUI1, "WebUI Image uploader", "Upload image")
+        System(WebUI2, "WebU2 Image display", "Dispalay images")
+        
+        Enterprise_Boundary(b1, "Prototype") {
+            System(WebApp,"Python Flask WebApp","Upload and display images")
+            SystemQueue(TestQueue,"test_queue","Queue images for processing")
+            System(Worker1,"Python Image processor,"Process images using CV2 library")
+            
+            
+            
+            System(RabbitMQ,"Rabbit MQ","Server RabbitMQ")
+            SystemQueue(TestDbWrt,"test_dbwrt","Queue processed images to store in database")
+            System(Worker2,"Python Database Writer","Write processed images in database")
+            SystemDb(ImageDB,"CouchDB","Database to store processed images")
+        }
+    Rel(customerA, WebUI1,"Upload image")
+    Rel(customerB, WebUI2, "View processed images")
+    BiRel(WebUI1, WebApp , "API upload image")
+    BiRel(WebUI2, WebApp , "API get image ")
+    Rel(WebApp, TestQueue, "Publish image to Queue for processing")
+    Rel(TestQueue, Worker1, "Read Image from Queue")
+    Rel(Worker1, TestDbWrt, "Publish processed Image to queue")
+    Rel(TestDbWrt,Worker2,"Read images for saving")
+    Rel(Worker2,ImageDB,"Save images into DB")
+    Rel(ImageDB,WebApp,"Read images")
+    UpdateLayoutConfig($c4ShapeInRow="2", $c4BoundaryInRow="1")
+```
+
+
 
 ## Користні лінки
 
