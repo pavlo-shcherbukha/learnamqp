@@ -9,7 +9,7 @@ gunicorn
 requests
 #opencv-contrib-python
 #numpy
-#ibmcloudant
+ibmcloudant
 
 
 
