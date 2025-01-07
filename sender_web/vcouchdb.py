@@ -97,7 +97,7 @@ class CouchDB:
                                         db='dbimage',
                                         selector={"typedoc": {"$eq": "GREY"}},
                                         fields=["_id","filename","typedoc","correlation_id"],
-                                        limit=3
+                                        limit=50
                                         ).get_result()
         return imgList     
 

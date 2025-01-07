@@ -43,7 +43,7 @@ devadm/qq
 
 docker-compose -f docker-compose-websender.yaml stop
 
-docker-compose -f docker-compose-websender.yaml up --remove-orphans --build sender-web  receiver-web writer-web
+docker-compose -f docker-compose-websender.yaml up --remove-orphans --build sender-web receiver-web writer-web
 
 ```
 

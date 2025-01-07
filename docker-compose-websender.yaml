@@ -51,6 +51,10 @@ services:
       RABBITMQ_PASSWORD: "guest"
       RABBITMQ_HOST: "rabbitmq"
       RABBITMQ_PORT: "5672"      
+      COUCHDB_AUTH_TYPE: "COUCHDB_SESSION"
+      COUCHDB_URL: "http://couchdb:5984"
+      COUCHDB_USERNAME: "devadm"
+      COUCHDB_PASSWORD: "qq"         
   receiver-web:
     build:
       context: ./
